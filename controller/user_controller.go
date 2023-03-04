@@ -16,6 +16,7 @@ import (
 )
 
 type UserController struct {
+	router *gin.RouterGroup
 	usecase usecase.UserUsecase
 }
 
@@ -70,8 +71,9 @@ func (c *UserController) Remove(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func NewUserController(u usecase.UserUsecase) *UserController {
+func NewUserController(r *gin.RouterGroup, u usecase.UserUsecase) *UserController {
 	controller := UserController {
+		router: r,
 		usecase: u,
 	}
 

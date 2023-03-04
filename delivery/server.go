@@ -1,0 +1,59 @@
+package delivery
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/eulbyvan/go-user-management/config"
+	"github.com/eulbyvan/go-user-management/controller"
+	"github.com/eulbyvan/go-user-management/manager"
+	"github.com/gin-gonic/gin"
+)
+
+type AppServer struct {
+	usecaseManager 	manager.UsecaseManager
+	engine			*gin.Engine
+	host			string
+}
+
+func (p *AppServer) v1() {
+	v1Routes := p.engine.Group("/v1")
+	userRouterGroup := v1Routes.Group("/users")
+	p.userController(userRouterGroup)
+}
+
+func (p *AppServer) userController(rg *gin.RouterGroup) {
+	userController := controller.NewUserController(rg, p.usecaseManager.UserUsecase())
+	rg.GET("", userController.GetAll)
+	rg.GET("/:id", userController.GetOne)
+	rg.POST("", userController.Add)
+	rg.PUT("", userController.Edit)
+	rg.DELETE("/:id", userController.Remove)
+}
+
+func (p *AppServer) Run() {
+	p.v1()
+	err := p.engine.Run(p.host)
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Application failed to run", err)
+		}
+	}()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func Server() *AppServer {
+	r := gin.Default()
+	c := config.NewConfig()
+	infraManager := manager.NewInfraManager(c)
+	repoManager := manager.NewRepoManager(infraManager)
+	usecaseManager := manager.NewUsecaseManager(repoManager)
+	host := fmt.Sprintf(":%s", c.ApiPort)
+	return &AppServer{
+		usecaseManager: usecaseManager,
+		engine: r,
+		host: host,
+	}
+}
