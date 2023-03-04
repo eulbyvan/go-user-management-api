@@ -1,3 +1,9 @@
+/*
+ * Author : Ismail Ash Shidiq (https://eulbyvan.netlify.app)
+ * Created on : Sat Mar 04 2023 9:47:36 PM
+ * Copyright : Ismail Ash Shidiq © 2023. All rights reserved
+ */
+
 package config
 
 import "github.com/eulbyvan/go-user-management/utils"
