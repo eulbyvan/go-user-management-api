@@ -11,15 +11,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eulbyvan/go-user-management/model"
+	"github.com/eulbyvan/go-user-management/model/entity"
 )
 
 type UserRepo interface {
 	FindAll() any
 	FindOne(id int) any
-	Create(newUser *model.User) string
-	Update(user *model.User) string
-	Delete(id int) string
+	Create(newUser *entity.User) any
+	Update(user *entity.User) any
+	Delete(id int) any
 }
 
 type userRepo struct {
@@ -27,9 +27,9 @@ type userRepo struct {
 }
 
 func (r *userRepo) FindAll() any {
-	var users []model.User
+	var users []entity.User
 
-	query := "SELECT id, first_name, last_name, email FROM users"
+	query := "SELECT id, first_name, last_name, email FROM users ORDER BY id"
 	rows, err := r.db.Query(query)
 	if err != nil {
 		log.Println(err)
@@ -38,7 +38,7 @@ func (r *userRepo) FindAll() any {
 	defer rows.Close()
 
 	for rows.Next() {
-		var user model.User
+		var user entity.User
 		if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email); err != nil {
 			log.Println(err)
 		}
@@ -49,15 +49,11 @@ func (r *userRepo) FindAll() any {
 		log.Println(err)
 	}
 
-	if len(users) == 0 {
-		return "No data"
-	}
-
 	return users
 }
 
 func (r *userRepo) FindOne(id int) any {
-	var userInDb model.User
+	var userInDb entity.User
 
 	query := "SELECT id, first_name, last_name, email FROM users WHERE id = $1"
 	row := r.db.QueryRow(query, id)
@@ -68,33 +64,29 @@ func (r *userRepo) FindOne(id int) any {
 		log.Println(err)
 	}
 
+	// Jika tidak ada, return nil
 	if userInDb.ID == 0 {
-		return "User not found"
+		return nil
 	}
 
 	return userInDb
 }
 
-func (r *userRepo) Create(newUser *model.User) string {
+func (r *userRepo) Create(newUser *entity.User) any {
 	query := "INSERT INTO users (first_name, last_name, email) VALUES ($1, $2, $3)"
 	_, err := r.db.Exec(query, newUser.FirstName, newUser.LastName, newUser.Email)
 
 	if err != nil {
 		log.Println(err)
-		return "Failed to create user"
+		return nil
 	}
 
-	return "User created successfully"
+	return r.FindAll()
 }
 
-func (r *userRepo) Update(user *model.User) string {
+func (r *userRepo) Update(user *entity.User) any {
 	// Cari user di database
 	res := r.FindOne(user.ID)
-
-	// Jika tidak ada, return pesan
-	if res == "User not found" {
-		return res.(string)
-	}
 
 	// Jika ada maka update user
 	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4"
@@ -103,27 +95,27 @@ func (r *userRepo) Update(user *model.User) string {
 		log.Println(err)
 	}
 
-	// Jika berhasil update, return pesan
-	return fmt.Sprintf("User with id %d updated successfully", user.ID)
+	// Jika berhasil update, return hasil
+	return res
 }
 
-func (r *userRepo) Delete(id int) string {
+func (r *userRepo) Delete(id int) any {
 	// Cari user di database
 	res := r.FindOne(id)
 
-	// Jika tidak ada, return pesan
-	if res == "User not found" {
-		return res.(string)
+	if res == nil {
+		return "User not found"
 	}
 
 	query := "DELETE FROM users WHERE id = $1"
 	_, err := r.db.Exec(query, id)
 	if err != nil {
 		log.Println(err)
-		return "Failed to delete user"
+		return fmt.Sprintf("Failed to delete user with id: %d", id)
 	}
 
-	return fmt.Sprintf("User with id %d deleted successfully", id)
+	// return fmt.Sprintf("User with id %d deleted successfully", id)
+	return r.FindAll()
 }
 
 func NewUserRepository(db *sql.DB) UserRepo {

@@ -7,16 +7,16 @@
 package usecase
 
 import (
-	"github.com/eulbyvan/go-user-management/model"
+	"github.com/eulbyvan/go-user-management/model/entity"
 	"github.com/eulbyvan/go-user-management/repository"
 )
 
 type UserUsecase interface {
 	GetAll() any
 	GetOne(id int) any
-	Add(newUser *model.User) string
-	Edit(user *model.User) string
-	Remove(id int) string
+	Add(newUser *entity.User) any
+	Edit(user *entity.User) any
+	Remove(id int) any
 }
 
 type userUsecase struct {
@@ -31,15 +31,15 @@ func (u *userUsecase) GetOne(id int) any {
 	return u.userRepo.FindOne(id)
 }
 
-func (u *userUsecase) Add(newUser *model.User) string {
+func (u *userUsecase) Add(newUser *entity.User) any {
 	return u.userRepo.Create(newUser)
 }
 
-func (u *userUsecase) Edit(user *model.User) string {
+func (u *userUsecase) Edit(user *entity.User) any {
 	return u.userRepo.Update(user)
 }
 
-func (u *userUsecase) Remove(id int) string {
+func (u *userUsecase) Remove(id int) any {
 	return u.userRepo.Delete(id)
 }
 

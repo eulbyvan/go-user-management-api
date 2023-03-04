@@ -4,7 +4,7 @@
  * Copyright : Ismail Ash Shidiq © 2023. All rights reserved
  */
 
-package model
+package entity
 
 type User struct {
 	ID int `json:"id"`
