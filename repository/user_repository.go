@@ -104,7 +104,7 @@ func (r *userRepo) Delete(id int) any {
 	res := r.FindOne(id)
 
 	if res == nil {
-		return "User not found"
+		return res
 	}
 
 	query := "DELETE FROM users WHERE id = $1"

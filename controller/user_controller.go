@@ -8,6 +8,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -25,7 +26,7 @@ type UserController struct {
 
 func (c *UserController) GetAll(ctx *gin.Context) {
 	res := c.usecase.GetAll()
-	c.Success(ctx, 0, "", "", res)
+	c.Success(ctx, 0, "", "Successfully retrieved all user data", res)
 }
 
 func (c *UserController) GetOne(ctx *gin.Context) {
@@ -41,7 +42,7 @@ func (c *UserController) GetOne(ctx *gin.Context) {
 		return
 	}
 
-	c.Success(ctx, http.StatusOK, "", "", res)
+	c.Success(ctx, http.StatusOK, "", fmt.Sprintf("Successfully retrieved user with id: %d", id), res)
 }
 
 func (c *UserController) Add(ctx *gin.Context) {
@@ -53,7 +54,7 @@ func (c *UserController) Add(ctx *gin.Context) {
 	}
 
 	res := c.usecase.Add(&user)
-	c.Success(ctx, http.StatusCreated, "", "Succesfully created user", res)
+	c.Success(ctx, http.StatusCreated, "", "Succesfully created new user", res)
 }
 
 func (c *UserController) Edit(ctx *gin.Context) {
@@ -69,7 +70,7 @@ func (c *UserController) Edit(ctx *gin.Context) {
 		return
 	}
 
-	c.Success(ctx, http.StatusCreated, "", fmt.Sprintf("Succesfully updated user with id: %d", user.ID), res)
+	c.Success(ctx, http.StatusOK, "", fmt.Sprintf("Succesfully updated user with id: %d", user.ID), res)
 }
 
 func (c *UserController) Remove(ctx *gin.Context) {
@@ -80,12 +81,13 @@ func (c *UserController) Remove(ctx *gin.Context) {
 	}
 
 	res := c.usecase.Remove(id)
+	log.Println("INIII", res)
 	if res == nil {
 		c.Failed(ctx, http.StatusNotFound, "X0",app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
 		return
 	}
 
-	c.Success(ctx, http.StatusCreated, "", fmt.Sprintf("Succesfully deleted user with id: %d", id), res)
+	c.Success(ctx, http.StatusOK, "", fmt.Sprintf("Succesfully deleted user with id: %d", id), res)
 }
 
 func NewUserController(r *gin.RouterGroup, u usecase.UserUsecase) *UserController {
