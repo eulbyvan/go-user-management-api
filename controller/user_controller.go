@@ -65,16 +65,16 @@ import (
 	 c.Success(ctx, http.StatusOK, "", fmt.Sprintf("Successfully retrieved user with ID %d", id), res)
  }
  
- func (c *UserController) Add(ctx *gin.Context) {
+func (c *UserController) Add(ctx *gin.Context) {
 	var user entity.User
-
-	if user.FirstName == "" || user.LastName == "" || user.Email == "" {
-		c.Failed(ctx, http.StatusBadRequest, "X01", app_error.InvalidError("one or more required fields are missing"))
-		return
-	}
 
 	if err := ctx.BindJSON(&user); err != nil {
 		c.Failed(ctx, http.StatusBadRequest, "", app_error.UnknownError(""))
+		return
+	}
+
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" {
+		c.Failed(ctx, http.StatusBadRequest, "X01", app_error.InvalidError("one or more required fields are missing"))
 		return
 	}
 
