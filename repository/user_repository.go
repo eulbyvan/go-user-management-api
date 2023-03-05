@@ -85,18 +85,13 @@ func (r *userRepo) Create(newUser *entity.User) any {
 }
 
 func (r *userRepo) Update(user *entity.User) any {
-	// Cari user di database
-	r.FindOne(user.ID)
-
-	// Jika ada maka update user
 	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4"
 	_, err := r.db.Exec(query, user.FirstName, user.LastName, user.Email, user.ID)
 	if err != nil {
 		log.Println(err)
 	}
 
-	// Jika berhasil update, return hasil
-	return user
+	return r.FindOne(user.ID)
 }
 
 func (r *userRepo) Delete(id int) any {
