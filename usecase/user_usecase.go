@@ -12,34 +12,34 @@ import (
 )
 
 type UserUsecase interface {
-	GetAll() any
-	GetOne(id int) any
-	Add(newUser *entity.User) any
-	Edit(user *entity.User) any
-	Remove(id int) any
+	GetAll() ([]entity.User, error)
+	GetOne(id int) (entity.User, error)
+	Add(newUser *entity.User) (entity.User, error)
+	Edit(user *entity.User) (entity.User, error)
+	Remove(id int) error
 }
 
 type userUsecase struct {
 	userRepo repository.UserRepo
 }
 
-func (u *userUsecase) GetAll() any {
+func (u *userUsecase) GetAll() ([]entity.User, error) {
 	return u.userRepo.FindAll()
 }
 
-func (u *userUsecase) GetOne(id int) any {
+func (u *userUsecase) GetOne(id int) (entity.User, error) {
 	return u.userRepo.FindOne(id)
 }
 
-func (u *userUsecase) Add(newUser *entity.User) any {
+func (u *userUsecase) Add(newUser *entity.User) (entity.User, error) {
 	return u.userRepo.Create(newUser)
 }
 
-func (u *userUsecase) Edit(user *entity.User) any {
+func (u *userUsecase) Edit(user *entity.User) (entity.User, error) {
 	return u.userRepo.Update(user)
 }
 
-func (u *userUsecase) Remove(id int) any {
+func (u *userUsecase) Remove(id int) error {
 	return u.userRepo.Delete(id)
 }
 

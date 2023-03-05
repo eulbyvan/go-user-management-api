@@ -17,7 +17,7 @@ func (e *AppError) Error() string {
 func InvalidError(msg string) error {
 	if msg == "" {
 		return &AppError{
-			ErrorMessage: "Invalid input",
+			ErrorMessage: "invalid input",
 			ErrorType: http.StatusBadRequest,
 		}
 	} else {
@@ -31,7 +31,7 @@ func InvalidError(msg string) error {
 func UnauthorizedError(msg string) error {
 	if msg == "" {
 		return &AppError{
-			ErrorMessage: "Unauthorized user",
+			ErrorMessage: "unauthorized user",
 			ErrorType: http.StatusUnauthorized,
 		}
 	} else {
@@ -45,7 +45,19 @@ func UnauthorizedError(msg string) error {
 func DataNotFoundError(msg string) error {
 	if msg == "" {
 		return &AppError{
-			ErrorMessage: "No data found",
+			ErrorMessage: "no data found",
+		}
+	} else {
+		return &AppError{
+			ErrorMessage: msg,
+		}
+	}
+}
+
+func InternalServerError(msg string) error {
+	if msg == "" {
+		return &AppError{
+			ErrorMessage: "something went wrong",
 		}
 	} else {
 		return &AppError{

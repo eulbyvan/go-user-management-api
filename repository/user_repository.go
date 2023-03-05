@@ -15,103 +15,106 @@ import (
 )
 
 type UserRepo interface {
-	FindAll() any
-	FindOne(id int) any
-	Create(newUser *entity.User) any
-	Update(user *entity.User) any
-	Delete(id int) any
+	FindAll() ([]entity.User, error)
+	FindOne(id int) (entity.User, error)
+	Create(newUser *entity.User) (entity.User, error)
+	Update(user *entity.User) (entity.User, error)
+	Delete(id int) error
 }
 
 type userRepo struct {
 	db *sql.DB
 }
 
-func (r *userRepo) FindAll() any {
-	var users []entity.User
+func (r *userRepo) FindAll() ([]entity.User, error) {
+    var users []entity.User
 
-	query := "SELECT id, first_name, last_name, email FROM users ORDER BY id"
-	rows, err := r.db.Query(query)
-	if err != nil {
-		log.Println(err)
-	}
+    query := "SELECT id, first_name, last_name, email FROM users ORDER BY id"
+    rows, err := r.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
 
-	defer rows.Close()
+    defer rows.Close()
 
-	for rows.Next() {
-		var user entity.User
-		if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email); err != nil {
-			log.Println(err)
-		}
-		users = append(users, user)
-	}
+    for rows.Next() {
+        var user entity.User
+        if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email); err != nil {
+            return nil, err
+        }
+        users = append(users, user)
+    }
 
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-	}
+    if err := rows.Err(); err != nil {
+        return nil, err
+    }
 
-	return users
+    return users, nil
 }
 
-func (r *userRepo) FindOne(id int) any {
-	var userInDb entity.User
+func (r *userRepo) FindOne(id int) (entity.User, error) {
+    var userInDb entity.User
 
-	query := "SELECT id, first_name, last_name, email FROM users WHERE id = $1"
-	row := r.db.QueryRow(query, id)
+    query := "SELECT id, first_name, last_name, email FROM users WHERE id = $1"
+    row := r.db.QueryRow(query, id)
 
-	err := row.Scan(&userInDb.ID, &userInDb.FirstName, &userInDb.LastName, &userInDb.Email)
+    err := row.Scan(&userInDb.ID, &userInDb.FirstName, &userInDb.LastName, &userInDb.Email)
 
-	if err != nil {
-		log.Println(err)
-	}
+    if err == sql.ErrNoRows {
+        return entity.User{}, fmt.Errorf("user with id %d not found", id)
+    } else if err != nil {
+        return entity.User{}, err
+    }
 
-	// Jika tidak ada, return nil
-	if userInDb.ID == 0 {
-		return nil
-	}
-
-	return userInDb
+    return userInDb, nil
 }
 
-func (r *userRepo) Create(newUser *entity.User) any {
-	query := "INSERT INTO users (first_name, last_name, email) VALUES ($1, $2, $3)"
-	_, err := r.db.Exec(query, newUser.FirstName, newUser.LastName, newUser.Email)
-
+func (r *userRepo) Create(newUser *entity.User) (entity.User, error) {
+	query := "INSERT INTO users (first_name, last_name, email) VALUES ($1, $2, $3) RETURNING id"
+	var userID int
+	err := r.db.QueryRow(query, newUser.FirstName, newUser.LastName, newUser.Email).Scan(&userID)
 	if err != nil {
 		log.Println(err)
-		return nil
+		return entity.User{}, err
 	}
 
-	return r.FindAll()
+	newUser.ID = userID
+
+	return *newUser, nil
 }
 
-func (r *userRepo) Update(user *entity.User) any {
-	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4"
-	_, err := r.db.Exec(query, user.FirstName, user.LastName, user.Email, user.ID)
+func (r *userRepo) Update(user *entity.User) (entity.User, error) {
+	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4 RETURNING id, first_name, last_name, email"
+	row := r.db.QueryRow(query, user.FirstName, user.LastName, user.Email, user.ID)
+
+	var updatedUser entity.User
+	err := row.Scan(&updatedUser.ID, &updatedUser.FirstName, &updatedUser.LastName, &updatedUser.Email)
 	if err != nil {
 		log.Println(err)
+		return entity.User{}, err
 	}
 
-	return r.FindOne(user.ID)
+	return updatedUser, nil
 }
 
-func (r *userRepo) Delete(id int) any {
-	// Cari user di database
-	res := r.FindOne(id)
-
-	if res == nil {
-		return res
-	}
-
-	query := "DELETE FROM users WHERE id = $1"
-	_, err := r.db.Exec(query, id)
-	if err != nil {
-		log.Println(err)
-		return fmt.Sprintf("Failed to delete user with id: %d", id)
-	}
-
-	// return fmt.Sprintf("User with id %d deleted successfully", id)
-	return r.FindAll()
+func (r *userRepo) Delete(id int) error {
+    query := "DELETE FROM users WHERE id = $1"
+    result, err := r.db.Exec(query, id)
+    if err != nil {
+        log.Println(err)
+        return err
+    }
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        log.Println(err)
+        return err
+    }
+    if rowsAffected == 0 {
+        return fmt.Errorf("user with id %d not found", id)
+    }
+    return nil
 }
+
 
 func NewUserRepository(db *sql.DB) UserRepo {
 	repo := new(userRepo)

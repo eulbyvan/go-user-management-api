@@ -14,7 +14,7 @@ const (
 
 	DefaultErrorCode			= "X00"
 	DefaultErrorStatus			= "Failed"
-	DefaultErrorMessage 		= "Something went wrong"
+	DefaultErrorMessage 		= "something went wrong"
 )
 
 type AppHttpResponse interface {
