@@ -8,7 +8,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -81,7 +80,6 @@ func (c *UserController) Remove(ctx *gin.Context) {
 	}
 
 	res := c.usecase.Remove(id)
-	log.Println("INIII", res)
 	if res == nil {
 		c.Failed(ctx, http.StatusNotFound, "X0",app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
 		return
