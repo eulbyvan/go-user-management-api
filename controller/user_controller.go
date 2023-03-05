@@ -37,7 +37,7 @@ func (c *UserController) GetOne(ctx *gin.Context) {
 
 	res := c.usecase.GetOne(id)
 	if res == nil {
-		c.Failed(ctx, http.StatusNotFound, "X0", app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
+		c.Failed(ctx, http.StatusNotFound, "X04", app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
 		return
 	}
 
@@ -65,7 +65,7 @@ func (c *UserController) Edit(ctx *gin.Context) {
 
 	res := c.usecase.Edit(&user)
 	if res == nil {
-		c.Failed(ctx, http.StatusNotFound, "X0", app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", user.ID)))
+		c.Failed(ctx, http.StatusNotFound, "X04", app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", user.ID)))
 		return
 	}
 
@@ -81,7 +81,7 @@ func (c *UserController) Remove(ctx *gin.Context) {
 
 	res := c.usecase.Remove(id)
 	if res == nil {
-		c.Failed(ctx, http.StatusNotFound, "X0",app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
+		c.Failed(ctx, http.StatusNotFound, "X04", app_error.DataNotFoundError(fmt.Sprintf("No user with id: %d", id)))
 		return
 	}
 

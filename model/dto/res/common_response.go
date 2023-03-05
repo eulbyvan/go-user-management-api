@@ -12,7 +12,7 @@ const (
 	DefaultSuccessStatus		= "Success"
 	DefaultSuccessMessage      	= "Success"
 
-	DefaultErrorCode			= "X0"
+	DefaultErrorCode			= "X00"
 	DefaultErrorStatus			= "Failed"
 	DefaultErrorMessage 		= "Something went wrong"
 )
