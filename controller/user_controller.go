@@ -42,7 +42,7 @@ import (
  func (c *UserController) GetAll(ctx *gin.Context) {
 	 res, err := c.usecase.GetAll()
 	 if err != nil {
-		 c.Failed(ctx, http.StatusInternalServerError, "", app_error.InternalServerError(""))
+		 c.Failed(ctx, http.StatusInternalServerError, "", app_error.UnknownError(""))
 		 return
 	 }
  
@@ -74,7 +74,7 @@ import (
 	}
 
 	if err := ctx.BindJSON(&user); err != nil {
-		c.Failed(ctx, http.StatusBadRequest, "", app_error.InternalServerError(""))
+		c.Failed(ctx, http.StatusBadRequest, "", app_error.UnknownError(""))
 		return
 	}
 

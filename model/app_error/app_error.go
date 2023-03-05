@@ -60,7 +60,7 @@ func DataNotFoundError(msg string) error {
 	}
 }
 
-func InternalServerError(msg string) error {
+func UnknownError(msg string) error {
 	if msg == "" {
 		return &AppError{
 			ErrorMessage: "something went wrong",
