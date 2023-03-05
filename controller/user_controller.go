@@ -66,21 +66,27 @@ import (
  }
  
  func (c *UserController) Add(ctx *gin.Context) {
-	 var user entity.User
- 
-	 if err := ctx.BindJSON(&user); err != nil {
-		c.Failed(ctx, http.StatusBadRequest, "X01", app_error.InvalidError("invalid request body"))
+	var user entity.User
+
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" {
+		c.Failed(ctx, http.StatusBadRequest, "X01", app_error.InvalidError("one or more required fields are missing"))
 		return
-	 }
- 
-	 res, err := c.usecase.Add(&user)
-	 if err != nil {
-		 c.Failed(ctx, http.StatusInternalServerError, "", fmt.Errorf("failed to create user"))
-		 return
-	 }
- 
-	 c.Success(ctx, http.StatusCreated, "01", "Successfully created new user", res)
- }
+	}
+
+	if err := ctx.BindJSON(&user); err != nil {
+		c.Failed(ctx, http.StatusBadRequest, "", app_error.InternalServerError(""))
+		return
+	}
+
+	res, err := c.usecase.Add(&user)
+	if err != nil {
+		c.Failed(ctx, http.StatusInternalServerError, "", fmt.Errorf("failed to create user"))
+		return
+	}
+
+	c.Success(ctx, http.StatusCreated, "01", "Successfully created new user", res)
+}
+
  
  func (c *UserController) Edit(ctx *gin.Context) {
 	 var user entity.User
