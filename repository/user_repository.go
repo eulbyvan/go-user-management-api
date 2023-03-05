@@ -86,7 +86,7 @@ func (r *userRepo) Create(newUser *entity.User) any {
 
 func (r *userRepo) Update(user *entity.User) any {
 	// Cari user di database
-	res := r.FindOne(user.ID)
+	r.FindOne(user.ID)
 
 	// Jika ada maka update user
 	query := "UPDATE users SET first_name = $1, last_name = $2, email = $3 WHERE id = $4"
@@ -96,7 +96,7 @@ func (r *userRepo) Update(user *entity.User) any {
 	}
 
 	// Jika berhasil update, return hasil
-	return res
+	return user
 }
 
 func (r *userRepo) Delete(id int) any {
