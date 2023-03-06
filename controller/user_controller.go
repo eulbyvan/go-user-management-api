@@ -16,7 +16,7 @@ import (
 	"github.com/eulbyvan/go-user-management/usecase"
 	"github.com/gin-gonic/gin"
 )
- 
+
 type UserController struct {
 	BaseController
 	router  *gin.RouterGroup
@@ -28,7 +28,7 @@ func NewUserController(r *gin.RouterGroup, u usecase.UserUsecase) *UserControlle
 		router:  r,
 		usecase: u,
 	}
-
+	r.Group("/users")
 	// define routes
 	r.GET("/users", controller.GetAll)
 	r.GET("/users/:id", controller.GetOne)
@@ -94,7 +94,7 @@ func (c *UserController) Edit(ctx *gin.Context) {
 		c.Failed(ctx, http.StatusBadRequest, "", app_error.InvalidError("invalid request body"))
 		return
 	}
- 
+
 	res, err := c.usecase.Edit(&user)
 	if err != nil {
 		c.Failed(ctx, http.StatusNotFound, "X04", app_error.DataNotFoundError(fmt.Sprintf("user with id %d not found", user.ID)))

@@ -4,6 +4,20 @@
  * Copyright : Ismail Ash Shidiq © 2023. All rights reserved
  */
 
+/*
+	Install package testify
+	go get github.com/stretchr/testify
+    go get github.com/DATA-DOG/go-sqlmock
+
+	Rule of Thumbs
+	1. Tidak boleh berkomunikasi dengan remote database
+	2. Tidak boleh berkomunikasi secara lintas network
+    3. Tidak boleh melakukan setup konfigurasi di environment
+
+
+	go test ./...
+*/
+
 package main
 
 import (

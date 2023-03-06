@@ -17,24 +17,18 @@ import (
 )
 
 type AppServer struct {
-	usecaseManager 	manager.UsecaseManager
-	engine			*gin.Engine
-	host			string
+	usecaseManager manager.UsecaseManager
+	engine         *gin.Engine
+	host           string
 }
 
 func (p *AppServer) v1() {
 	v1Routes := p.engine.Group("/v1")
-	userRouterGroup := v1Routes.Group("/users")
-	p.userController(userRouterGroup)
+	p.userController(v1Routes)
 }
 
 func (p *AppServer) userController(rg *gin.RouterGroup) {
-	userController := controller.NewUserController(rg, p.usecaseManager.UserUsecase())
-	rg.GET("", userController.GetAll)
-	rg.GET("/:id", userController.GetOne)
-	rg.POST("", userController.Add)
-	rg.PUT("", userController.Edit)
-	rg.DELETE("/:id", userController.Remove)
+	controller.NewUserController(rg, p.usecaseManager.UserUsecase())
 }
 
 func (p *AppServer) Run() {
@@ -59,7 +53,7 @@ func Server() *AppServer {
 	host := fmt.Sprintf(":%s", c.ApiPort)
 	return &AppServer{
 		usecaseManager: usecaseManager,
-		engine: r,
-		host: host,
+		engine:         r,
+		host:           host,
 	}
 }
